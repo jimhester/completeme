@@ -16,6 +16,18 @@ halt <- function(msg, type = NULL) {
   abort(do.call(glue, c(msg, .envir = parent.frame())), type = type)
 }
 
+#' Register completion functions
+#'
+#' Completion functions should take one parameter `env`, the completion
+#' environment, see `?rc.settings` for details of this environment. They should
+#' set the `comps` and `fileName` fields of the completion and return `TRUE` if
+#' no further completions should be attempted. They should return `FALSE` if
+#' there are no completions for the current context.
+#'
+#' If all registered completions return `FALSE` for a given context, than R's
+#' standard completions are used.
+#' @param ... One or more completion functions specified as named parameters.
+#' @export
 register_completion <- function(...) {
   funs <- list(...)
 
@@ -56,6 +68,35 @@ completeme <- function(env) {
   rc.options(custom.completer = completeme)
 }
 
-in_function_call <- get("inFunction", asNamespace("utils"))
-inside_quotes <- get("isInsideQuotes", asNamespace("utils"))
+#' Completion helpers
+#'
+#' @param env The completion environment, see `?rc.status()` for details.
+#' @name helpers
+NULL
+
+#' @describeIn helpers Returns the current function call, or `""` if
+#' not within a call.
+#' @export
+current_function <- function(env) {
+  fun <- get("inFunction", asNamespace("utils"))
+  res <- fun(line = env[["linebuffer"]], cursor = env[["start"]])
+  if (length(res) == 0) {
+    return("")
+  }
+  res
+}
+
+#' @describeIn helpers Returns `TRUE` if within single or double quotes.
+#' @importFrom utils head
+#' @export
+# Adapted from utils:::isInsideQuotes
+inside_quotes <- function(env) {
+  (env[["start"]] > 0 && {
+    linebuffer <- env[["linebuffer"]]
+    lbss <- head(unlist(strsplit(linebuffer, "")),
+      env[["end"]])
+    ((sum(lbss == "'") %% 2 == 1) || (sum(lbss == "\"") %% 2 == 1))
+  })
+}
+
 complete_token <- get(".completeToken", asNamespace("utils"))
