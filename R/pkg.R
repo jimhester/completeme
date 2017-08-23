@@ -11,6 +11,7 @@ vals <- function(x) {
 
 #' @importFrom glue glue
 #' @importFrom rlang abort
+#' @importFrom utils modifyList
 halt <- function(msg, type = NULL) {
   abort(do.call(glue, c(msg, .envir = parent.frame())), type = type)
 }
@@ -30,45 +31,30 @@ register_completion <- function(...) {
   invisible(old)
 }
 
-complete <- function(env) {
+#' @importFrom utils rc.options
+completeme <- function(env) {
   for (fun in the$completions) {
     if (isTRUE(fun(env))) {
       return()
     }
   }
   # Fall back to using the default completer
-  on.exit(rc.options(custom.completer = complete))
+  on.exit(rc.options(custom.completer = completeme))
   rc.options(custom.completer = NULL)
   complete_token()
 }
 
 #' @importFrom rlang warn
-.onLoad <- function(x, y) {
+#' @importFrom utils rc.getOption rc.options
+.onLoad <- function(lib, pkg) {
   if (!is.null(default <- rc.getOption("custom.completer"))) {
-    if (!isTRUE(all.equal(default, complete))) {
+    if (!isTRUE(all.equal(default, completeme))) {
       warn("Found default custom.completer, registering as 'default'")
       #register_completion(default = default)
     }
   }
-  rc.options(custom.completer = complete)
+  rc.options(custom.completer = completeme)
 }
-
-# from https://github.com/jimhester/readxl/blob/87b4d03fcb1952ef75cc5359cf2e0bf936a7abbd/R/example.R
-readxl_example_completer <- function(env) {
-  env2 <<- env
-  fun <- in_function_call()
-  if (length(fun) > 0 && fun == "readxl_example" && inside_quotes()) {
-
-    # Completion within readxl_example uses the example filenames
-    comps <- grep(paste0("^\"?", env$token, "."), readxl_example(), value = TRUE)
-    env[["fileName"]] <- comps
-    env[["comps"]] <- comps
-    return (TRUE)
-  }
-  return (FALSE)
-}
-
-register_completion(a = readxl_example_completer)
 
 in_function_call <- get("inFunction", asNamespace("utils"))
 inside_quotes <- get("isInsideQuotes", asNamespace("utils"))
