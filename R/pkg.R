@@ -20,12 +20,10 @@ halt <- function(msg, type = NULL) {
 #'
 #' Completion functions should take one parameter `env`, the completion
 #' environment, see `?rc.settings` for details of this environment. They should
-#' set the `comps` and `fileName` fields of the completion and return `TRUE` if
-#' no further completions should be attempted. They should return `FALSE` if
-#' there are no completions for the current context.
+#' simply return any completions found or `return(NULL)` otherwise.
 #'
-#' If all registered completions return `FALSE` for a given context, than R's
-#' standard completions are used.
+#' If all registered completions do not have any completions for a given
+#' context, than R's standard completions are used.
 #' @param ... One or more completion functions specified as named parameters.
 #' @export
 register_completion <- function(...) {
@@ -45,11 +43,17 @@ register_completion <- function(...) {
 
 #' @importFrom utils rc.options
 completeme <- function(env) {
+  env$fileName <- FALSE
+
   for (fun in the$completions) {
-    if (isTRUE(fun(env))) {
+    env$comps <- fun(env)
+    if (length(env$comps) > 0) {
       return()
     }
   }
+
+  env$comps <- character()
+
   # Fall back to using the default completer
   on.exit(rc.options(custom.completer = completeme))
   rc.options(custom.completer = NULL)
@@ -62,7 +66,8 @@ completeme <- function(env) {
   if (!is.null(default <- rc.getOption("custom.completer"))) {
     if (!isTRUE(all.equal(default, completeme))) {
       warn("Found default custom.completer, registering as 'default'")
-      #register_completion(default = default)
+      #TODO: turn this on
+      # register_completion(default = default)
     }
   }
   rc.options(custom.completer = completeme)
