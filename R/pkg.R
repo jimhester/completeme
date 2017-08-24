@@ -118,4 +118,23 @@ inside_quotes <- function(env) {
   })
 }
 
+#' @describeIn helpers Returns `TRUE` if currently completing the first argument.
+#' @export
+# utils:::getIsFirstArg
+is_first_argument <- function(env) {
+  isTRUE(env[["isFirstArg"]])
+}
+
+#' @describeIn helpers Returns the current named argument, or `""` if not
+#' completing a named argument.
+#' @export
+current_argument <- function(env) {
+  buffer <- env[["linebuffer"]]
+  arg <- rematch2::re_match(buffer, "\\b(?<arg>[^(=[:space:]]+)[[:space:]]*=(?:[^=]|==)*$")$arg
+  if (!is.na(arg)) {
+    return(arg)
+  }
+  ""
+}
+
 complete_token <- get(".completeToken", asNamespace("utils"))
