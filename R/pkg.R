@@ -42,22 +42,36 @@ register_completion <- function(...) {
 }
 
 #' @importFrom utils rc.options
+#' @importFrom rlang %||%
 completeme <- function(env) {
-  env$fileName <- FALSE
-
   for (fun in the$completions) {
     env$comps <- fun(env)
     if (length(env$comps) > 0) {
-      return()
+      attributes(env$comps) <- list(class = "completions", type = attr(env$comps, "type") %||% 15)
+      return(invisible(env$comps))
     }
   }
 
   env$comps <- character()
 
-  # Fall back to using the default completer
+  # if in the IDE, throw an error to fallback on normal completion
+  if (rstudioapi::isAvailable()) {
+    abort("No custom completions", type = "no_completions")
+  }
+
+  # If on the command line, fall back to using the default completer
   on.exit(rc.options(custom.completer = completeme))
   rc.options(custom.completer = NULL)
   complete_token()
+
+  invisible(env$comps)
+}
+
+unique.completions <- function(x, ...) {
+  attrs <- attributes(x)
+  res <- unique(unclass(x))
+  mostattributes(attrs) <- attrs
+  x
 }
 
 #' @importFrom rlang warn

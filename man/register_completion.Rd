@@ -12,11 +12,9 @@ register_completion(...)
 \description{
 Completion functions should take one parameter `env`, the completion
 environment, see `?rc.settings` for details of this environment. They should
-set the `comps` and `fileName` fields of the completion and return `TRUE` if
-no further completions should be attempted. They should return `FALSE` if
-there are no completions for the current context.
+simply return any completions found or `return(NULL)` otherwise.
 }
 \details{
-If all registered completions return `FALSE` for a given context, than R's
-standard completions are used.
+If all registered completions do not have any completions for a given
+context, than R's standard completions are used.
 }
