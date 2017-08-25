@@ -97,12 +97,12 @@ NULL
 #' not within a call.
 #' @export
 current_function <- function(env) {
-  fun <- get("inFunction", asNamespace("utils"))
-  res <- fun(line = env[["linebuffer"]], cursor = env[["start"]])
-  if (length(res) == 0) {
+  buffer <- env[["linebuffer"]]
+  fun <- rematch2::re_match(buffer, "(?<fun>[^[:space:](]+)[(][^(]*$")$fun
+  if (is.na(fun)) {
     return("")
   }
-  res
+  fun
 }
 
 #' @describeIn helpers Returns `TRUE` if within single or double quotes.
