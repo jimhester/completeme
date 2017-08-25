@@ -1,6 +1,8 @@
 context("current_function")
 
 test_that("current_function returns the current function, `\"\"` otherwise", {
+  env <- new.env()
+
   env$linebuffer <- ''
   expect_equal(current_function(env), "")
 
