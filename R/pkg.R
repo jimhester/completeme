@@ -44,6 +44,7 @@ register_completion <- function(...) {
 #' @importFrom utils rc.options
 #' @importFrom rlang %||%
 completeme <- function(env) {
+  env$fileName <- FALSE
   for (fun in the$completions) {
     env$comps <- fun(env)
     if (length(env$comps) > 0) {
