@@ -3,7 +3,7 @@ Version: 0.0.0.9000
 Title: What the Package Does (one line, title case)
 Description: What the package does (one paragraph).
 Authors@R: person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre"))
-Imports: glue, rlang, rematch2
+Imports: glue, rlang, rematch2, rstudioapi
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
