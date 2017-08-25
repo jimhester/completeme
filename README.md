@@ -1,5 +1,6 @@
 # completeme
 [![Travis build status](https://travis-ci.org/jimhester/completeme.svg?branch=master)](https://travis-ci.org/jimhester/completeme)
+[![Coverage status](https://codecov.io/gh/jimhester/completeme/branch/master/graph/badge.svg)](https://codecov.io/github/jimhester/completeme?branch=master)
 
 The goal of completeme is to help me, help you. It allows package authors and
 users to register a set of completion functions to define custom completions.

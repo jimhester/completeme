@@ -9,8 +9,9 @@ Imports:
     rematch2,
     rlang,
     rstudioapi
-Suggests:
-    testthat
+Suggests: 
+    testthat,
+    covr
 ByteCompile: true
 Encoding: UTF-8
 LazyData: true
