@@ -68,13 +68,6 @@ completeme <- function(env) {
   invisible(env$comps)
 }
 
-unique.completions <- function(x, ...) {
-  attrs <- attributes(x)
-  res <- unique(unclass(x))
-  mostattributes(attrs) <- attrs
-  x
-}
-
 #' @importFrom rlang warn
 #' @importFrom utils rc.getOption rc.options
 .onLoad <- function(lib, pkg) {
@@ -89,3 +82,26 @@ unique.completions <- function(x, ...) {
 }
 
 complete_token <- get(".completeToken", asNamespace("utils"))
+
+# utils:::.retrieveCompletions calls unique on the completions, so we don't
+# want to drop attributes.
+unique.completions <- function(x, ...) {
+  dups <- duplicated(x, ...)
+
+  if (!any(dups)) {
+    return(x)
+  }
+
+  attrs <- attributes(x)
+  res <- x[!dups]
+  for (i in seq_along(attrs)) {
+
+    # If attributes are the same length as x they likely correspond to the
+    # completions.
+    if (length(attrs[[i]]) == length(x)) {
+      attrs[[i]] <- attrs[[i]][!dups]
+    }
+  }
+  mostattributes(res) <- attrs
+  res
+}
