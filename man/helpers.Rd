@@ -6,6 +6,8 @@
 \alias{inside_quotes}
 \alias{is_first_argument}
 \alias{current_argument}
+\alias{is_comment}
+\alias{is_roxygen_comment}
 \title{Completion helpers}
 \usage{
 current_function(env)
@@ -15,6 +17,10 @@ inside_quotes(env)
 is_first_argument(env)
 
 current_argument(env)
+
+is_comment(env)
+
+is_roxygen_comment(env)
 }
 \arguments{
 \item{env}{The completion environment, see `?rc.status()` for details.}
@@ -33,5 +39,9 @@ not within a call.
 
 \item \code{current_argument}: Returns the current named argument, or `""` if not
 completing a named argument.
+
+\item \code{is_comment}: Returns `TRUE` if the current context is a comment.
+
+\item \code{is_roxygen_comment}: Returns `TRUE` if the current context is a roxygen comment.
 }}
 

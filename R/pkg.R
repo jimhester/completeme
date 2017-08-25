@@ -152,3 +152,25 @@ return_unless <- function(x) {
     return_to(parent.frame(2))
   }
 }
+
+remove_quotes <- function(x) {
+  # This handles escaped quotes as well
+  # https://stackoverflow.com/a/4925400/2055486
+  re <- '["\'](([^\"\\\\]+|\\\\.)*)["\']'
+
+  gsub(re, "", x)
+}
+
+#' @describeIn helpers Returns `TRUE` if the current context is a comment.
+#' @export
+is_comment <- function(env) {
+  buffer <- env[["linebuffer"]]
+  !is.na(rematch2::re_match(remove_quotes(buffer), "#")$.match)
+}
+
+#' @describeIn helpers Returns `TRUE` if the current context is a roxygen comment.
+#' @export
+is_roxygen_comment <- function(env) {
+  buffer <- env[["linebuffer"]]
+  !is.na(rematch2::re_match(remove_quotes(buffer), "#'")$.match)
+}
