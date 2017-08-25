@@ -120,9 +120,10 @@ inside_quotes <- function(env) {
 
 #' @describeIn helpers Returns `TRUE` if currently completing the first argument.
 #' @export
-# utils:::getIsFirstArg
+# utils:::getIsFirstArg doesn't seem to actually work
 is_first_argument <- function(env) {
-  isTRUE(env[["isFirstArg"]])
+  buffer <- env[["linebuffer"]]
+  !is.na(rematch2::re_match(buffer, "[^[:space:](]+[(][^[:space:]=,]*$")$.match)
 }
 
 #' @describeIn helpers Returns the current named argument, or `""` if not
