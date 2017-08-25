@@ -138,3 +138,16 @@ current_argument <- function(env) {
 }
 
 complete_token <- get(".completeToken", asNamespace("utils"))
+
+#' Return from a function unless a condition is met
+#'
+#' This function can be used to return early from a function unless a condition
+#' is met. It is equivalent to `if (!x) return()`.
+#' @param x Condition to be evaluated.
+#' @importFrom rlang return_to
+#' @export
+return_unless <- function(x) {
+  if (!isTRUE(x)) {
+    return_to(parent.frame(2))
+  }
+}
