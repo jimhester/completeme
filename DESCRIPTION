@@ -1,13 +1,17 @@
 Package: completeme
-Version: 0.0.0.9000
 Title: What the Package Does (one line, title case)
-Description: What the package does (one paragraph).
+Version: 0.0.0.9000
 Authors@R: person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre"))
-Imports: glue, rlang, rematch2, rstudioapi
+Description: What the package does (one paragraph).
 License: MIT + file LICENSE
+Imports:
+    glue,
+    rematch2,
+    rlang,
+    rstudioapi
+Suggests:
+    testthat
+ByteCompile: true
 Encoding: UTF-8
 LazyData: true
-ByteCompile: true
 RoxygenNote: 6.0.1
-Suggests: 
-    testthat
