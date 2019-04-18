@@ -18,4 +18,4 @@ them with **completeme** in `.onLoad()`.
 
 ---
 
-Name inspired by [YouCompleteMe](https://github.com/Valloric/YouCompleteMe) and [Maverick](https://cbskool2.files.wordpress.com/2013/01/topgun3d-2-400.jpg?w=400).
+Name inspired by [YouCompleteMe](https://github.com/Valloric/YouCompleteMe) and [Maverick](https://media.giphy.com/media/tChHURpFSqaQg/giphy.gif).
