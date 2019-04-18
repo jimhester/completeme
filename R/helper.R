@@ -58,7 +58,8 @@ current_argument <- function(env) {
 #' @export
 return_unless <- function(x) {
   if (!isTRUE(x)) {
-    return_to(parent.frame(2))
+    return_from(parent.frame(2))
+
   }
 }
 
