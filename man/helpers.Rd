@@ -21,8 +21,6 @@ inFunction(env)
 }
 \description{
 Completion helpers
-
-originally Adapted from utils:::inFunction()
 }
 \section{Functions}{
 \itemize{
@@ -32,7 +30,22 @@ originally Adapted from utils:::inFunction()
 
 \item \code{is_roxygen_comment}: Returns `TRUE` if the current context is a roxygen comment.
 
-\item \code{inFunction}: Checks to see if we are in a function. If
-we are then it returns an list loaded with information about what has been typed so far
+\item \code{inFunction}: Checks to see if we are in a function. If we are then it returns an list loaded with information about what has been typed so far
 }}
 
+\author{
+Adam Wheeler
+I started dreaming. This function has been heavily modified to be aware of
+the cursor position, the related argument, all the arguments possible
+and the values of such arguments
+(does not handle dots I may need to add this though)
+Determine if we are at the first argument and it is not named In this situation
+we would return the name of the first item in currArgs
+If not the first argument then first we can check to see if our current
+argument is not named. In this sutuation we would find how many commas
+have been typed and return name in currArgs at the index of the comma
+if it is named then we grab the name then look to see the starting position
+of our current argument, get the length of the match trim the ws and return the result.
+Check to see if the suffix position is less than the first comma in the suffix
+this is the first argument
+}

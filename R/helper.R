@@ -69,13 +69,11 @@ argNames <-
       names(formals(args))
   }
 
-#'originally Adapted from utils:::inFunction()
-#'@describeIn helpers Checks to see if we are in a function. If
-#'we are then it returns an list loaded with information about what has been typed so far
-#'@export
-inFunction <-
-  function(env)
-  {
+
+#' @describeIn helpers Checks to see if we are in a function. If we are then it returns an list loaded with information about what has been typed so far
+#' @export
+#' @author Adam Wheeler
+inFunction <- function(env) {
     line <- env[["linebuffer"]]
     cursor <- env[["start"]]
     inFun <- list()
