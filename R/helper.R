@@ -4,17 +4,6 @@
 #' @name helpers
 NULL
 
-#' @describeIn helpers Returns the current function call, or `""` if
-#' not within a call.
-#' @export
-current_function <- function(env) {
-  buffer <- env[["linebuffer"]]
-  fun <- rematch2::re_match(buffer, "(?<fun>[^[:space:](]+)[(][^(]*$")$fun
-  if (is.na(fun)) {
-    return("")
-  }
-  fun
-}
 
 #' @describeIn helpers Returns `TRUE` if within single or double quotes.
 #' @importFrom utils head
@@ -29,25 +18,6 @@ inside_quotes <- function(env) {
   })
 }
 
-#' @describeIn helpers Returns `TRUE` if currently completing the first argument.
-#' @export
-# utils:::getIsFirstArg doesn't seem to actually work
-is_first_argument <- function(env) {
-  buffer <- env[["linebuffer"]]
-  !is.na(rematch2::re_match(buffer, "[^[:space:](]+[(][^[:space:]=,]*$")$.match)
-}
-
-#' @describeIn helpers Returns the current named argument, or `""` if not
-#' completing a named argument.
-#' @export
-current_argument <- function(env) {
-  buffer <- env[["linebuffer"]]
-  arg <- rematch2::re_match(buffer, "\\b(?<arg>[^(=[:space:]]+)[[:space:]]*=(?:[^=]|==)*$")$arg
-  if (!is.na(arg)) {
-    return(arg)
-  }
-  ""
-}
 
 #' Return from a function unless a condition is met
 #'
@@ -84,3 +54,142 @@ is_roxygen_comment <- function(env) {
   buffer <- env[["linebuffer"]]
   !is.na(rematch2::re_match(remove_quotes(buffer), "#'")$.match)
 }
+
+
+argNames <-
+  function(fname)
+  {
+
+    args <- do.call(argsAnywhere, list(fname))
+    if (is.null(args))
+      character()
+    else if (is.list(args))
+      unlist(lapply(args, function(f) names(formals(f))))
+    else
+      names(formals(args))
+  }
+
+#'originally Adapted from utils:::inFunction()
+#'@describeIn helpers Checks to see if we are in a function. If
+#'we are then it returns an list loaded with information about what has been typed so far
+#'@export
+inFunction <-
+  function(env)
+  {
+    line <- env[["linebuffer"]]
+    cursor <- env[["start"]]
+    inFun <- list()
+    ## are we inside a function? Yes if the number of ( encountered
+    ## going backwards exceeds number of ).  In that case, we would
+    ## also like to know what function we are currently inside
+    ## (ideally, also what arguments to it have already been supplied,
+    ## but let's not dream that far ahead).
+    #' I started dreaming. This function has been heavily modified to be aware of
+    #' the cursor position, the related argument, all the arguments possible
+    #' and the values of such arguments
+    #' (does not handle dots I may need to add this though)
+
+    parens <-
+      sapply(c("(", ")"),
+             function(s) gregexpr(s, substr(line, 1L, cursor), fixed = TRUE)[[1L]],
+             simplify = FALSE)
+    ## remove -1's
+    parens <- lapply(parens, function(x) x[x > 0])
+
+    ## The naive algo is as follows: set counter = 0; go backwards
+    ## from cursor, set counter-- when a ) is encountered, and
+    ## counter++ when a ( is encountered.  We are inside a function
+    ## that starts at the first ( with counter > 0.
+
+    temp <-
+      data.frame(i = c(parens[["("]], parens[[")"]]),
+                 c = rep(c(1, -1), lengths(parens)))
+    if (nrow(temp) == 0) return(character())
+    temp <- temp[order(-temp$i), , drop = FALSE] ## order backwards
+    wp <- which(cumsum(temp$c) > 0)
+    if (length(wp)) # inside a function
+    {
+      ## return guessed name of function, letting someone else
+      ## decide what to do with that name
+
+      index <- temp$i[wp[1L]]
+      prefix <- substr(line, 1L, index - 1L)
+      suffix <- substr(line, index + 1L, cursor + 1L)
+
+
+
+      possible <- suppressWarnings(strsplit(prefix, "[^\\.\\w]", perl = TRUE))[[1L]]
+      possible <- possible[nzchar(possible)]
+      if (length(possible))
+        inFun$currentFunction <- tail(possible, 1)
+
+      arguments <- argNames(inFun$currentFunction)
+      if (length(arguments) < 1L){
+        return(inFun)
+      }
+      currArgs <- list()
+      length(currArgs) <- length(arguments)
+      names(currArgs) <- arguments
+
+      for (x in strsplit(suffix,",")) {
+        subArg <- strsplit(x,"[=|]")
+        i <- 1L
+        for (y in subArg) {
+         if(length(y) > 1){
+            currArgs[trimws(y[1])] <- trimws(y[2])
+         }else{
+           currArgs[i] <- trimws(y)
+         }
+          i = i + 1L
+        }
+
+      }
+
+      inFun$currArgs <- currArgs
+
+      #'Determine if we are at the first argument and it is not named In this situation
+      #'we would return the name of the first item in currArgs
+      #'If not the first argument then first we can check to see if our current
+      #'argument is not named. In this sutuation we would find how many commas
+      #'have been typed and return name in currArgs at the index of the comma
+      #'if it is named then we grab the name then look to see the starting position
+      #'of our current argument, get the length of the match trim the ws and return the result.
+
+      suffixPos <- cursor - nchar(prefix) -1L
+
+      prevCommaPos <- gregexpr(",", substr(suffix,0, suffixPos ), fixed = TRUE)
+      prevEqualPos <- gregexpr("=", substr(suffix,0, suffixPos ), fixed = TRUE)
+      #'Check to see if the suffix position is less than the first comma in the suffix
+      if (prevCommaPos[[1]][1] == -1L)
+      {
+        # Check to see if there is an equal sign
+        if (prevEqualPos[[1]][1] == -1L)
+        {
+          #there is no comma and no equal sign -- function(|)
+          inFun$IsFirstArg <- TRUE
+          #' this is the first argument
+          inFun$currentArg <- names(currArgs)[1]
+
+        }else{
+          #there is no comma and there is an equal sign --function(x=|)
+          inFun$currentArg <- trimws(substr(suffix,0,prevEqualPos[[1]][1]-1))
+          inFun$IsFirstArg <- identical(inFun$currentArg,names(currArgs)[1])
+        }
+      }else if(prevEqualPos[[1]][length(prevEqualPos[[1]])] > prevCommaPos[[1]][length(prevCommaPos[[1]])]){
+          #There is a comma and and an equal sign after it
+          #so lets get what is between the comma and the equal sign
+          inFun$currentArg <- trimws(substr(suffix,prevCommaPos[[1]][which.max(prevCommaPos[[1]])]+1,prevEqualPos[[1]][which.max(prevEqualPos[[1]])]-1))
+          inFun$IsFirstArg <- identical(inFun$currentArg,names(currArgs)[1])
+        }else{
+          #There is a comma and no equal sign so get the argument by position
+          inFun$currentArg <- names(currArgs)[length(prevCommaPos)+1]
+          inFun$IsFirstArg <- FALSE
+        }
+
+      return(inFun)
+    }
+    else # not inside function
+    {
+      return(FALSE)
+    }
+  }
