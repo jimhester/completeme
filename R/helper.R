@@ -56,24 +56,25 @@ is_roxygen_comment <- function(env) {
 }
 
 
-argNames <-
+arg_names <-
   function(fname)
   {
-
     args <- do.call(argsAnywhere, list(fname))
     if (is.null(args))
       character()
     else if (is.list(args))
-      unlist(lapply(args, function(f) names(formals(f))))
+      unlist(lapply(args, function(f) formals(f)))
     else
-      names(formals(args))
+      formals(args)
   }
 
 
-#' @describeIn helpers Checks to see if we are in a function. If we are then it returns an list loaded with information about what has been typed so far
+#' @describeIn helpers Checks to see if we are in a function.
+#'    If we are then it returns a list loaded with information
+#'    about what has been typed so far.
+#'@author person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut", "cre"))
 #' @export
-#' @author Adam Wheeler
-inFunction <- function(env) {
+in_function <- function(env) {
     line <- env[["linebuffer"]]
     cursor <- env[["start"]]
     inFun <- list()
@@ -82,10 +83,11 @@ inFunction <- function(env) {
     ## also like to know what function we are currently inside
     ## (ideally, also what arguments to it have already been supplied,
     ## but let's not dream that far ahead).
-    #' I started dreaming. This function has been heavily modified to be aware of
-    #' the cursor position, the related argument, all the arguments possible
-    #' and the values of such arguments
-    #' (does not handle dots I may need to add this though)
+    ## I started dreaming. This function has been heavily modified from
+    ## the utils packageto be aware of the cursor position, the
+    ## related argument, all the arguments possible
+    ## and the values of such arguments
+    ## (does not yet handle recursing through dots I may need to add this though)
 
     parens <-
       sapply(c("(", ")"),
@@ -102,7 +104,7 @@ inFunction <- function(env) {
     temp <-
       data.frame(i = c(parens[["("]], parens[[")"]]),
                  c = rep(c(1, -1), lengths(parens)))
-    if (nrow(temp) == 0) return(character())
+    if (nrow(temp) == 0) return(FALSE)
     temp <- temp[order(-temp$i), , drop = FALSE] ## order backwards
     wp <- which(cumsum(temp$c) > 0)
     if (length(wp)) # inside a function
@@ -121,15 +123,22 @@ inFunction <- function(env) {
       if (length(possible))
         inFun$currentFunction <- tail(possible, 1)
 
-      arguments <- argNames(inFun$currentFunction)
+      arguments <- arg_names(inFun$currentFunction)
       if (length(arguments) < 1L){
+        ## We retrieved a function name but there isn't a function installed in
+        ## the current libraries by that name. for now just return the function
+        ## name we found.
+        ## TODO use this information to allow the user to insert a function
+        ## snippet for a new function at the current location, new file or
+        ## existing file.
         return(inFun)
       }
       currArgs <- list()
-      length(currArgs) <- length(arguments)
-      names(currArgs) <- arguments
 
-      for (x in strsplit(suffix,",")) {
+      length(currArgs) <- length(arguments)
+      names(currArgs) <- names(arguments)
+
+      for (x in strsplit(sub(")","", suffix),",")) {
         subArg <- strsplit(x,"[=|]")
         i <- 1L
         for (y in subArg) {
@@ -140,24 +149,23 @@ inFunction <- function(env) {
          }
           i = i + 1L
         }
-
       }
 
       inFun$currArgs <- currArgs
 
-      #'Determine if we are at the first argument and it is not named In this situation
-      #'we would return the name of the first item in currArgs
-      #'If not the first argument then first we can check to see if our current
-      #'argument is not named. In this sutuation we would find how many commas
-      #'have been typed and return name in currArgs at the index of the comma
-      #'if it is named then we grab the name then look to see the starting position
-      #'of our current argument, get the length of the match trim the ws and return the result.
+      ## Determine if we are at the first argument and it is not named In this situation
+      ## we would return the name of the first item in currArgs
+      ## If not the first argument then first we can check to see if our current
+      ## argument is not named. In this sutuation we would find how many commas
+      ## have been typed and return name in currArgs at the index of the comma
+      ## if it is named then we grab the name then look to see the starting position
+      ## of our current argument, get the length of the match trim the ws and return the result.
 
       suffixPos <- cursor - nchar(prefix) -1L
 
       prevCommaPos <- gregexpr(",", substr(suffix,0, suffixPos ), fixed = TRUE)
       prevEqualPos <- gregexpr("=", substr(suffix,0, suffixPos ), fixed = TRUE)
-      #'Check to see if the suffix position is less than the first comma in the suffix
+      #Check to see if the suffix position is less than the first comma in the suffix
       if (prevCommaPos[[1]][1] == -1L)
       {
         # Check to see if there is an equal sign
@@ -165,7 +173,7 @@ inFunction <- function(env) {
         {
           #there is no comma and no equal sign -- function(|)
           inFun$IsFirstArg <- TRUE
-          #' this is the first argument
+          # this is the first argument
           inFun$currentArg <- names(currArgs)[1]
 
         }else{
@@ -184,10 +192,13 @@ inFunction <- function(env) {
           inFun$IsFirstArg <- FALSE
         }
 
+      # Assign default values where the current value is NULL.
+      inFun$currArgs <- modifyList(inFun$currArgs, arguments[intersect(names(Filter(is.null, inFun$currArgs)),names(Filter(Negate(is.null),arguments)))])
+
       return(inFun)
-    }
-    else # not inside function
-    {
-      return(FALSE)
-    }
   }
+  else # not inside function
+  { # dont think there is a path to this code
+      return(FALSE)
+  }
+}
