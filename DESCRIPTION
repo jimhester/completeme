@@ -1,8 +1,9 @@
 Package: completeme
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: Complete Me
+Version: 0.0.0.9007
+Authors@R: c(person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre")),
+            person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut")))
+Description: This package enables a developer to manipulate the base system autocomplete.
 License: GPL-3
 Imports:
     glue,
@@ -15,4 +16,4 @@ Suggests:
 ByteCompile: true
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
