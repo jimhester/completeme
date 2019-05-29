@@ -68,13 +68,17 @@ arg_names <-
       formals(args)
   }
 #' @describeIn helpers Exposes the normalCompletions function from the utils package.
+#' @param text The text to perform the completion on.
+#' @param check.mode Checks to see if there is a function with the same name, if so it adds the add.fun to the end
+#' @param add.fun Defaults to `rc.getOption("function.suffix")`.
 #'@export
 normal_completions <- getFromNamespace("normalCompletions","utils")
+
 
 #' @describeIn helpers Checks to see if we are in a function.
 #'    If we are then it returns a list loaded with information
 #'    about what has been typed so far.
-#'@author person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut", "cre"))
+#'@author person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut"))
 #' @export
 #' @importFrom utils tail
 # Adopted and expanded from utils:::inFunction()
