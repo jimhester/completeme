@@ -55,7 +55,7 @@ is_roxygen_comment <- function(env) {
   !is.na(rematch2::re_match(remove_quotes(buffer), "#'")$.match)
 }
 
-
+#' @importFrom utils argsAnywhere
 arg_names <-
   function(fname)
   {
@@ -67,7 +67,7 @@ arg_names <-
     else
       formals(args)
   }
-
+#' @describeIn helpers Exposes the normalCompletions function from the utils package.
 #'@export
 normal_completions <- getFromNamespace("normalCompletions","utils")
 
@@ -76,6 +76,7 @@ normal_completions <- getFromNamespace("normalCompletions","utils")
 #'    about what has been typed so far.
 #'@author person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut", "cre"))
 #' @export
+#' @importFrom utils tail
 # Adopted and expanded from utils:::inFunction()
 in_function <- function(env) {
     line <- env[["linebuffer"]]
