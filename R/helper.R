@@ -67,7 +67,7 @@ arg_names <-
     else
       formals(args)
   }
-
+#' @describeIn helpers Exposes the normalCompletions function from the utils package.
 #'@export
 normal_completions <- getFromNamespace("normalCompletions","utils")
 
