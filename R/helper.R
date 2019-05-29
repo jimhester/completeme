@@ -74,6 +74,7 @@ arg_names <-
 #'    about what has been typed so far.
 #'@author person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut", "cre"))
 #' @export
+# Adopted and expanded from utils:::inFunction()
 in_function <- function(env) {
     line <- env[["linebuffer"]]
     cursor <- env[["start"]]
