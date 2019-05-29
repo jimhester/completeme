@@ -69,9 +69,6 @@ arg_names <-
   }
 
 #'@export
-utils:::normalCompletions()
-
-#'@export
 normal_completions <- getFromNamespace("normalCompletions","utils")
 
 #' @describeIn helpers Checks to see if we are in a function.
