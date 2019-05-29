@@ -5,6 +5,7 @@
 \alias{inside_quotes}
 \alias{is_comment}
 \alias{is_roxygen_comment}
+\alias{normal_completions}
 \alias{in_function}
 \title{Completion helpers}
 \usage{
@@ -13,6 +14,9 @@ inside_quotes(env)
 is_comment(env)
 
 is_roxygen_comment(env)
+
+normal_completions(text, check.mode = TRUE,
+  add.fun = rc.getOption("function.suffix"))
 
 in_function(env)
 }
@@ -29,6 +33,8 @@ Completion helpers
 \item \code{is_comment}: Returns `TRUE` if the current context is a comment.
 
 \item \code{is_roxygen_comment}: Returns `TRUE` if the current context is a roxygen comment.
+
+\item \code{normal_completions}: Exposes the normalCompletions function from the utils package.
 
 \item \code{in_function}: Checks to see if we are in a function.
 If we are then it returns a list loaded with information
