@@ -69,6 +69,9 @@ arg_names <-
   }
 
 
+#'@export
+normal_completions <- getFromNamespace("normalCompletions","utils")
+
 #' @describeIn helpers Checks to see if we are in a function.
 #'    If we are then it returns a list loaded with information
 #'    about what has been typed so far.
@@ -172,10 +175,10 @@ in_function <- function(env) {
         # Check to see if there is an equal sign
         if (prevEqualPos[[1]][1] == -1L)
         {
-          #there is no comma and no equal sign -- function(|)
-          inFun$IsFirstArg <- TRUE
           # this is the first argument
           inFun$currentArg <- names(currArgs)[1]
+          #there is no comma and no equal sign -- function(|)
+          inFun$IsFirstArg <- TRUE
 
         }else{
           #there is no comma and there is an equal sign --function(x=|)

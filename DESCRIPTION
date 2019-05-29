@@ -1,6 +1,6 @@
 Package: completeme
 Title: What the Package Does (one line, title case)
-Version: 0.0.0.9003
+Version: 0.0.0.9004
 Authors@R: person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 License: GPL-3
