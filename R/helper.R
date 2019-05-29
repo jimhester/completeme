@@ -68,6 +68,8 @@ arg_names <-
       formals(args)
   }
 
+#'@export
+utils:::normalCompletions()
 
 #'@export
 normal_completions <- getFromNamespace("normalCompletions","utils")
