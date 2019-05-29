@@ -1,6 +1,6 @@
 Package: completeme
 Title: Complete Me
-Version: 0.0.0.9006
+Version: 0.0.0.9007
 Authors@R: c(person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre")),
             person("Adam", "Wheeler", email = "ajwtech@gmail.com", role = c("aut")))
 Description: This package enables a developer to manipulate the base system autocomplete.
