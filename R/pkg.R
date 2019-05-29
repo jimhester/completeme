@@ -48,7 +48,7 @@ completeme <- function(env) {
   for (fun in the$completions) {
     env$comps <- fun(env)
     if (length(env$comps) > 0) {
-      attributes(env$comps) <- list(class = "completions", type = attr(env$comps, "type") %||% 15)
+      attributes(env$comps) <- list(class = "completions", type = attr(env$comps, "type") %||% 5)
       return(invisible(env$comps))
     }
   }
